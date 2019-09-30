@@ -1,0 +1,233 @@
+---
+title: "Chapter 4 - Distributions of Random Variables"
+author: 'Jose A. Mawyin'
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    extra_dependencies:
+    - geometry
+    - multicol
+    - multirow
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DATA606)
+```
+
+**Area under the curve, Part I**. (4.1, p. 142) What percent of a standard normal distribution $N(\mu=0, \sigma=1)$ is found in each region? Be sure to draw a graph.
+
+(a) $Z < -1.35$
+```{r}
+pnorm(-1.35)
+normalPlot(0, bounds = c(-9999, -1.35))
+
+```
+
+(b) $Z > 1.48$
+```{r}
+1-pnorm(1.48)
+normalPlot(0, bounds = c(1.48,9999))
+```
+
+(c) $-0.4 < Z < 1.5$
+```{r}
+pnorm(1.5)-pnorm(-0.4)
+normalPlot(0, bounds = c(-0.4, 1.5))
+```
+
+(d) $|Z| > 2$
+```{r}
+pnorm(-2)+1-pnorm(2)
+normalPlot(0, bounds = c(-2,2), tails = TRUE)
+```
+
+
+```{r, echo=FALSE}
+# use the DATA606::normalPlot function
+```
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Triathlon times, Part I** (4.4, p. 142) In triathlons, it is common for racers to be placed into age and gender groups. Friends Leo and Mary both completed the Hermosa Beach Triathlon, where Leo competed in the *Men, Ages 30 - 34* group while Mary competed in the *Women, Ages 25 - 29* group. Leo completed the race in 1:22:28 (4948 seconds), while Mary completed the race in 1:31:53 (5513 seconds). Obviously Leo finished faster, but they are curious about how they did within their respective groups. Can you help them? Here is some information on the performance of their groups:
+
+* The finishing times of the \textit{Men, Ages 30 - 34} group has a mean of 4313 seconds with a standard deviation of 583 seconds.
+* The finishing times of the \textit{Women, Ages 25 - 29} group has a mean of 5261 seconds with a standard deviation of 807 seconds.
+* The distributions of finishing times for both groups are approximately Normal.
+
+Remember: a better performance corresponds to a faster finish.
+
+(a) Write down the short-hand for these two normal distributions.
+**For Leo:**
+$$N\left( \mu =4313s,\quad \sigma =583s \right) $$
+**For Mary:**
+$$N\left( \mu =5261s,\quad \sigma =807s \right) $$
+
+(b) What are the Z-scores for Leo's and Mary's finishing times? What do these Z-scores tell you?
+$$Z=\frac { Observation-Mean }{ S.D. } $$
+**The z-score for Leo is 1.09 and for Mary is 0.31.**
+(c) Did Leo or Mary rank better in their respective groups? Explain your reasoning.
+**Both Leo and Mary took longer to finish their races than the average of their groups. However, Mary finished closer to mean time than Leo who finished towards the tail end of the men's racing times.**
+(d) What percent of the triathletes did Leo finish faster than in his group?
+```{r}
+1-pnorm(4948, mean = 4313, sd = 583 )
+```
+**Leo finished faster than the last 14% (rounded) of the men in the race.**
+
+(e) What percent of the triathletes did Mary finish faster than in her group?
+```{r}
+1-pnorm(5513, mean = 5261, sd = 807 )
+```
+**Mary finished the race quicker than 38% (rounded) of the women in the competition.**
+
+(f) If the distributions of finishing times are not nearly normal, would your answers to parts (b) - (e) change? Explain your reasoning.
+**The results will change. If the distributions were not nearly normal, it will shift the percentages of left or right of the calculated values.**
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Heights of female college students** Below are heights of 25 female college students.
+
+\[ \stackrel{1}{54}, \stackrel{2}{55}, \stackrel{3}{56}, \stackrel{4}{56}, 
+\stackrel{5}{57}, \stackrel{6}{58}, \stackrel{7}{58}, \stackrel{8}{59}, 
+\stackrel{9}{60}, \stackrel{10}{60}, \stackrel{11}{60}, \stackrel{12}{61}, 
+\stackrel{13}{61}, \stackrel{14}{62}, \stackrel{15}{62}, \stackrel{16}{63}, 
+\stackrel{17}{63}, \stackrel{18}{63}, \stackrel{19}{64}, \stackrel{20}{65}, 
+\stackrel{21}{65}, \stackrel{22}{67}, \stackrel{23}{67}, \stackrel{24}{69}, 
+\stackrel{25}{73} \]
+
+(a) The mean height is 61.52 inches with a standard deviation of 4.58 inches. Use this information to determine if the heights approximately follow the 68-95-99.7% Rule.
+```{r}
+Height.mean <- 61.52
+Height.SD <- 4.58
+One.SD <- (Height.mean+1*Height.SD)
+Two.SD <- (Height.mean+2*Height.SD)
+Three.SD <- (Height.mean+3*Height.SD)
+pnorm(One.SD,mean = Height.mean, sd = Height.SD )
+pnorm(Two.SD,mean = Height.mean, sd = Height.SD )
+pnorm(Three.SD,mean = Height.mean, sd = Height.SD )
+```
+
+**The height data does not follow the 68-95-99.7% Rule. The data shows that the distribution is skewed explaining the uneven distribution.**
+
+(b) Do these data appear to follow a normal distribution? Explain your reasoning using the graphs provided below.
+
+
+**The data seems to follow a normal distribution. However, the distribution looks to be right or positively skewed.**
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.show="hold", out.width="50%", fig.height=3}
+library(openintro)
+heights <- c(54, 55, 56, 56, 57, 58, 58, 59, 60, 60, 60, 61, 
+            61, 62, 62, 63, 63, 63, 64, 65, 65, 67, 67, 69, 73)
+par(mar=c(3.7,2.2,1,1), las=1, mgp=c(2.5,0.7,0), mfrow = c(1,1), cex.lab = 1.5, cex.axis = 1.5)
+histPlot(heights, col = COL[1], xlab = "Heights", ylab = "", probability = TRUE, axes = FALSE, ylim = c(0,0.085))
+axis(1)
+x <- heights
+xfit <- seq(min(x)-5, max(x)+5, length = 400)
+yfit <- dnorm(xfit, mean = mean(x), sd = sd(x))
+lines(xfit, yfit, col = COL[4], lwd = 2)
+par(mar=c(3.7,3.7,1,1), las=1, mgp=c(2.5,0.7,0), mfrow = c(1,1), cex.lab = 1.5, cex.axis = 1.5)
+qqnorm(heights, col = COL[1], pch = 19, main = "", axes = FALSE)
+axis(1)
+axis(2)
+qqline(heights, col = COL[1])
+```
+
+```{r}
+# Use the DATA606::qqnormsim function
+```
+
+```{r}
+qqnormsim(heights)
+```
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Defective rate.** (4.14, p. 148) A machine that produces a special type of transistor (a component of computers) has a 2% defective rate. The production is considered a random process where each transistor is independent of the others.
+
+(a) What is the probability that the 10th transistor produced is the first with a defect?
+$$P\left( success\quad on\quad the\quad { n }^{ th }\quad trial \right) \quad =\quad { (1-p) }^{ n-1 }p$$
+**Where p = 0.02 and n = 10. Therefore the probability that the 10th transistor produced is the first with a defect is 0.017**
+(b) What is the probability that the machine produces no defective transistors in a batch of 100?
+**The probability is equal to ${ p }^{ n }$ where p is 0.98 and n is 100. Therefore the probability is 0.133.**
+
+(c) On average, how many transistors would you expect to be produced before the first with a defect? What is the standard deviation?
+$$\mu =\frac { 1 }{ p } \qquad \sigma =\sqrt { \frac { 1-p }{ { p }^{ 2 } }  } $$
+**The mean value of transistors before failure is 50 units with a standard deviation of 49.5**
+
+(d) Another machine that also produces transistors has a 5% defective rate where each transistor
+is produced independent of the others. On average how many transistors would you expect to be produced with this machine before the first with a defect? What is the standard deviation?
+**With a 5% defective rate, the mean value of transistors before failure is 20 units with a standard deviation of 19.5**
+
+(e) Based on your answers to parts (c) and (d), how does increasing the probability of an event affect the mean and standard deviation of the wait time until success?
+**The smaller the probability of success makes the standard deviation closser to the mean or expected value. We can see this in the equation above for** $\sigma$ **when p is very small.**
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Male children.** While it is often assumed that the probabilities of having a boy or a girl are the same, the actual probability of having a boy is slightly higher at 0.51. Suppose a couple plans to have 3 kids.
+
+(a) Use the binomial model to calculate the probability that two of them will be boys.
+$$P\quad =\left( \begin{matrix} n \\ k \end{matrix} \right) { p }^{ k }{ \left( 1-p \right)  }^{ \left( n-k \right)  }}$$
+**We can use the probability function for k successes in n trials.**
+$$\left( \begin{matrix} n \\ k \end{matrix} \right) =\frac { n! }{ k!\left( n-k \right) ! } $$
+**Using the choose function for calculating the number of ways to choose k successes in n trials.**
+
+**Where k = 2, p = 0.51 and n = 3. Then we find that the probability that two of them will be boys is 0.38 (rounded).**
+
+(b) Write out all possible orderings of 3 children, 2 of whom are boys. Use these scenarios to calculate the same probability from part (a) but using the addition rule for disjoint outcomes. Confirm that your answers from parts (a) and (b) match.
+**The possible orderings are:**
+**{BBW, BWB, WBB} and every outcome has the probability of 0.127. The addition rule for disjoint outcomes tell us that the total probability is given by # of scenarios × P(single scenario). Therefore, the total probability is equal to 3x0.127 or 0.38 (rounded).**
+ 
+(c) If we wanted to calculate the probability that a couple who plans to have 8 kids will have 3 boys, briefly describe why the approach from part (b) would be more tedious than the approach from part (a).
+**Is a lot easier to find the number of positive matches using the choose function than manualy sorting through all the cases.**
+
+
+
+
+
+--------------------------------------------------------------------------------
+
+\clearpage
+
+**Serving in volleyball.** (4.30, p. 162) A not-so-skilled volleyball player has a 15% chance of making the serve, which involves hitting the ball so it passes over the net on a trajectory such that it will land in the opposing team’s court. Suppose that her serves are independent of each other.
+
+(a) What is the probability that on the 10th try she will make her 3rd successful serve?
+**First, let us calculate the probability of 2 succeses in 9 shots using the probability function for k successes in n trials. Where n = 9, k = 2 and p = 0.15. **
+
+$$P\quad =\left( \begin{matrix} n \\ k \end{matrix} \right) { p }^{ k }{ \left( 1-p \right)  }^{ \left( n-k \right)  }}$$
+
+**This equation gives the probability of 0.252 which then we multiply by the probability of making a successful serve (0.15) to the find the the probability that on the 10th try she will make her 3rd successful serve which is 0.038**
+
+
+
+(b) Suppose she has made two successful serves in nine attempts. What is the probability that her 10th serve will be successful?
+**The probability of a successful 10th serve is 0.15**
+
+(c) Even though parts (a) and (b) discuss the same scenario, the probabilities you calculated should be different. Can you explain the reason for this discrepancy?
+**Part (a) is asking us for a series of successes given n and k conditions. Part (b) is only askings us the probability of a single event.**
+
+
+
+
+
